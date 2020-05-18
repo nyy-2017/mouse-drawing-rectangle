@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>鼠标框选效果</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #bottom {
+            position: absolute;
+            bottom: 0px;
+            width: 100%;
+            height: 40px;
+            border: 1px solid #000;
+            background: #000;
+            color: #fff;
+            pointer-events: none;
+        }
+
+        .tempDiv {
+            border: 1px dashed blue;
+            background: #5a72f8;
+            position: absolute;
+            width: 0;
+            height: 0;
+            filter: alpha(opacity:10);
+            opacity: 0.1
+        }
+    </style>
+    <script type="text/javascript">
+        window.onload = function () {
+            var stateBar = document.getElementById("bottom");
+            // 鼠标按下时
+            document.onmousedown = function (e) {
+                console.log("eeee:",e);
+                if(e.button ==2) return false; //禁止鼠标右键事件
+                var posx = e.clientX;
+                var posy = e.clientY;
+                var div = document.createElement("div");
+                div.className = "tempDiv";
+                div.style.left = e.clientX + "px";
+                div.style.top = e.clientY + "px";
+                document.body.appendChild(div);
+                let preBoxs = div.getElementsByClassName('tempDiv');
+                // 鼠标指针移出时
+                document.onmousemove = function (ev) {
+                    div.style.left = Math.min(ev.clientX, posx) + "px";
+                    div.style.top = Math.min(ev.clientY, posy) + "px";
+                    div.style.width = Math.abs(posx - ev.clientX) + "px";
+                    div.style.height = Math.abs(posy - ev.clientY) + "px";
+                    stateBar.innerHTML = "MouseX: " + ev.clientX + "<br/>MouseY: " + ev.clientY;
+                    //松开鼠标按钮时
+                    document.onmouseup = function () {
+                        console.log(2);
+                        div.parentNode.removeChild(div);
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                    }
+                }
+                //点击后---松开鼠标按钮时
+                document.onmouseup = function () {
+                    console.log(1);
+                    for(let i= 0; i < preBoxs.length; i++){
+                        if(preBoxs[i]){
+                            div.removeChild(preBoxs[i])
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="bottom"></div>
+</body>
+
+</html>
